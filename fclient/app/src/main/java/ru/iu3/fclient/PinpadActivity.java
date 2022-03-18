@@ -10,6 +10,8 @@ import android.widget.TextView;
 import android.os.Bundle;
 import android.view.View;
 
+import java.text.DecimalFormat;
+
 public class PinpadActivity extends AppCompatActivity {
     TextView tvPin;
     String pin = "";
@@ -31,8 +33,28 @@ public class PinpadActivity extends AppCompatActivity {
 
         findViewById(R.id.btnReset).setOnClickListener((View) -> {
             pin = "";
-            tvPin.setText("");
+            //tvPin.setText("");
+            tvPin.setText(pin);
         });
+
+        //Получение и работа с txtAmount
+        TextView ta = findViewById(R.id.txtAmount);
+        String amt = String.valueOf(getIntent().getStringExtra("amount"));
+        Long f = Long.valueOf(amt);
+        //Long f = 5L;
+        DecimalFormat df = new DecimalFormat("#,###,###,##0.00");
+        String s = df.format(f);
+        ta.setText("Сумма: " + s);
+
+        //Получение и работа с txtPtc
+        TextView tp = findViewById(R.id.txtPtc);
+        int pts = getIntent().getIntExtra("ptc", 0);
+        if (pts == 2) {
+            tp.setText("Осталось 2 попытки");
+        }
+        else if (pts == 1){
+            tp.setText("Осталась 1 попытка");
+        }
 
     }
 
