@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import ru.iu3.fclient.databinding.ActivityMainBinding;
 
+
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.Random;
@@ -26,8 +27,18 @@ import java.util.Random;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 
+
 import java.text.DecimalFormat;
 import java.lang.Long;
+
+
+//Добавлены в Lab_4_0
+import org.apache.commons.io.IOUtils;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class MainActivity extends AppCompatActivity implements TransactionEvents{
 
@@ -154,8 +165,9 @@ public class MainActivity extends AppCompatActivity implements TransactionEvents
         //startActivity(intent);
         // Вот здесь произошла замена: вместо startActivity поставил launch
         //activityResultLauncher.launch(intent);
-
+/*
         //Начало редактирования Lab_3_0
+//Было закоменчено в Lab_4_0
 
 
         new Thread(()-> {
@@ -172,9 +184,20 @@ public class MainActivity extends AppCompatActivity implements TransactionEvents
                // todo: log error
             }
         }).start();
-
+*/
         //byte[] trd = stringToHex("9F0206000000000100");
         //transaction(trd);
+
+        //Intent new_intent = new Intent();
+        //activityResultLauncher.launch(new_intent);
+        new Thread(()-> {
+            try {
+                testHttpClient();
+            }
+            catch (Exception ex) {
+                Log.println(Log.ERROR, "MTTLOG_New", ex.getMessage());
+            }
+        }).start();
     }
 
 
@@ -200,6 +223,73 @@ public class MainActivity extends AppCompatActivity implements TransactionEvents
     }
 
     //Конец изменений Lab_3_0
+
+    //Начало изменений Lab_4_0
+
+    protected void testHttpClient()
+    {
+        new Thread(() -> {
+            try {
+                HttpURLConnection uc = (HttpURLConnection)
+                        //(new URL("https://www.wikipedia.org").openConnection());
+                        //(new URL("https://www.gosuslugi.ru").openConnection());
+                          //(new URL("https://www.yandex.ru").openConnection());
+                        (new URL("http://10.0.2.2:8081/api/v1/title").openConnection());
+                InputStream inputStream = uc.getInputStream();
+                String html = IOUtils.toString(inputStream);
+                String title = getPageTitle(html);
+                if (title.equals("Портал государственных услуг Российской Федерации"))
+                {
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, title + " - Это фу сайт)", Toast.LENGTH_LONG).show();
+                    });
+                }
+                else {
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, title + " - Это хороший сайт", Toast.LENGTH_LONG).show();
+                    });
+                }
+            } catch (Exception ex) {
+                Log.e("fapptag", "Http client fails", ex);
+            }
+        }).start();
+    }
+
+    /* Это первоначальная версия вызовы getPageTitle (просто заглушка)
+    protected String getPageTitle(String html)
+    {
+        return "WWW";
+    }
+
+    //Версия с считыванием строки через позиции
+    protected String getPageTitle(String html)
+    {
+        int pos = html.indexOf("<title");
+        String p="not found";
+        if (pos >= 0)
+        {
+            int pos2 = html.indexOf("<", pos + 1);
+            if (pos >= 0)
+                p = html.substring(pos + 7, pos2);
+        }
+        return p;
+    }
+
+     */
+
+    //Версия с использованием решулярных выражений
+    protected String getPageTitle(String html)
+    {
+        Pattern pattern = Pattern.compile("<title>(.+?)</title>", Pattern.DOTALL);
+        Matcher matcher = pattern.matcher(html);
+        String p;
+        if (matcher.find())
+            p = matcher.group(1);
+        else
+            p = "Not found";
+        return p;
+    }
+    //Конец изменений Lab_4_0
     /**
      * A native method that is implemented by the 'fclient' native library,
      * which is packaged with this application.
