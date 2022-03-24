@@ -1,5 +1,6 @@
 package ru.iu3.fclient;
 
+
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -16,16 +17,30 @@ import android.widget.Toast;
 
 import ru.iu3.fclient.databinding.ActivityMainBinding;
 
+
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.Random;
-import java.io.*;
+//import java.io.*;
 
 //import org.apache.*;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 
-public class MainActivity extends AppCompatActivity {
+
+import java.text.DecimalFormat;
+import java.lang.Long;
+
+
+//Добавлены в Lab_4_0
+import org.apache.commons.io.IOUtils;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+public class MainActivity extends AppCompatActivity implements TransactionEvents{
 
     ActivityResultLauncher<Intent> activityResultLauncher;
 
@@ -37,6 +52,33 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
 
+    //Начало изменений Lab_3_0
+
+    private String pin;
+
+    @Override
+    public String enterPIN (int ptc, String amount)
+    {
+        pin = new String();
+        Intent it = new Intent(MainActivity.this, PinpadActivity.class);
+        it.putExtra("ptc", ptc);
+        it.putExtra("amount", amount);
+        synchronized (MainActivity.this)
+        {
+            activityResultLauncher.launch(it);
+            try {
+                MainActivity.this.wait();
+            } catch (Exception ex)
+            {
+                Log.println(Log.ERROR, "Mtlog", ex.getMessage());
+                //todo: log error;
+            }
+        }
+        return pin;
+    }
+
+    //Конец изменений lab_3_0
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -44,7 +86,6 @@ public class MainActivity extends AppCompatActivity {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
 
         int res = initRng();
         byte[] keys = randomBytes(16);
@@ -74,8 +115,8 @@ public class MainActivity extends AppCompatActivity {
         System.out.println("Расшифрованный массив - " + STR_4);
 
         // Example of a call to a native method
-        TextView tv = binding.sampleText;
-        tv.setText(stringFromJNI());
+        //TextView tv = binding.sampleText;
+        //tv.setText(stringFromJNI());
 
         activityResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -83,14 +124,24 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onActivityResult(ActivityResult result) {
                         if (result.getResultCode() == Activity.RESULT_OK) {
+                            //Intent intent = result.getData();
+                            //String pin = intent.getStringExtra("pin");
+                            //Toast.makeText(MainActivity.this, pin, Toast.LENGTH_SHORT).show();
                             Intent intent = result.getData();
-                            String pin = intent.getStringExtra("pin");
-
-                            Toast.makeText(MainActivity.this, pin, Toast.LENGTH_SHORT).show();
+                            pin = intent.getStringExtra("pin");
+                            synchronized (MainActivity.this) {
+                                MainActivity.this.notifyAll();
+                            }
                         }
                     }
                 }
-        );
+                );
+
+        //Начало изменений Lab_3_0
+
+
+
+        //Конец изменений Lab_3_0
     }
 
     //Далее закомменченная область - старые первоначальные тесты кнопок
@@ -110,12 +161,52 @@ public class MainActivity extends AppCompatActivity {
 */
 
     public void onButtonClick(View view) {
-        Intent intent = new Intent(this, PinpadActivity.class);
+       // Intent intent = new Intent(this, PinpadActivity.class);
         //startActivity(intent);
         // Вот здесь произошла замена: вместо startActivity поставил launch
-        activityResultLauncher.launch(intent);
+        //activityResultLauncher.launch(intent);
+/*
+        //Начало редактирования Lab_3_0
+//Было закоменчено в Lab_4_0
+
+
+        new Thread(()-> {
+            try {
+                byte[] trd = stringToHex("9F0206000000000100");
+                //boolean ok = transaction(trd);
+                transaction(trd);
+                //runOnUiThread(()-> {
+              //      Toast.makeText(MainActivity.this, ok ? "ok" : "failed", Toast.LENGTH_LONG);
+               // });
+            } catch (Exception ex) {
+                //System.out.println("OSHIBKA VIPOLNENIAY!");
+                Log.println(Log.ERROR, "MTTLOg", ex.getMessage());
+               // todo: log error
+            }
+        }).start();
+*/
+        //byte[] trd = stringToHex("9F0206000000000100");
+        //transaction(trd);
+
+        //Intent new_intent = new Intent();
+        //activityResultLauncher.launch(new_intent);
+        new Thread(()-> {
+            try {
+                testHttpClient();
+            }
+            catch (Exception ex) {
+                Log.println(Log.ERROR, "MTTLOG_New", ex.getMessage());
+            }
+        }).start();
     }
 
+
+    @Override
+    public void transactionResult(boolean result) {
+        runOnUiThread(()-> {
+            Toast.makeText(MainActivity.this, result ? "TRANSACTION COMPLETE" : "ERROR: Transaction did not complete", Toast.LENGTH_LONG).show();
+        });
+    }
 
     // Метод осуществляет конвертирование из String в HEX
     public static byte[] stringToHex(String s) {
@@ -131,10 +222,81 @@ public class MainActivity extends AppCompatActivity {
         return hex;
     }
 
+    //Конец изменений Lab_3_0
+
+    //Начало изменений Lab_4_0
+
+    protected void testHttpClient()
+    {
+        new Thread(() -> {
+            try {
+                HttpURLConnection uc = (HttpURLConnection)
+                        //(new URL("https://www.wikipedia.org").openConnection());
+                        //(new URL("https://www.gosuslugi.ru").openConnection());
+                        //(new URL("https://www.yandex.ru").openConnection());
+                        (new URL("http://10.0.2.2:8081/api/v1/title").openConnection());
+                InputStream inputStream = uc.getInputStream();
+                String html = IOUtils.toString(inputStream);
+                String title = getPageTitle(html);
+                if (title.equals("Портал государственных услуг Российской Федерации"))
+                {
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, title + " - Это гос сайт)", Toast.LENGTH_LONG).show();
+                    });
+                }
+                else {
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, title + " - Это хороший сайт", Toast.LENGTH_LONG).show();
+                    });
+                }
+            } catch (Exception ex) {
+                Log.e("fapptag", "Http client fails", ex);
+            }
+        }).start();
+    }
+
+    /* Это первоначальная версия вызовы getPageTitle (просто заглушка)
+    protected String getPageTitle(String html)
+    {
+        return "WWW";
+    }
+
+    //Версия с считыванием строки через позиции
+    protected String getPageTitle(String html)
+    {
+        int pos = html.indexOf("<title");
+        String p="not found";
+        if (pos >= 0)
+        {
+            int pos2 = html.indexOf("<", pos + 1);
+            if (pos >= 0)
+                p = html.substring(pos + 7, pos2);
+        }
+        return p;
+    }
+
+     */
+
+    //Версия с использованием решулярных выражений
+    protected String getPageTitle(String html)
+    {
+        Pattern pattern = Pattern.compile("<title>(.+?)</title>", Pattern.DOTALL);
+        Matcher matcher = pattern.matcher(html);
+        String p;
+        if (matcher.find())
+            p = matcher.group(1);
+        else
+            p = "Not found";
+        return p;
+    }
+    //Конец изменений Lab_4_0
+
+
     /**
      * A native method that is implemented by the 'fclient' native library,
      * which is packaged with this application.
      */
+    //public native String stringFromJNI();
     public native String stringFromJNI();
 
     public static native int initRng();
@@ -142,4 +304,8 @@ public class MainActivity extends AppCompatActivity {
 
     public static native byte[] encrypt(byte[] key, byte[] data);
     public static native byte[] decrypt(byte[] key, byte[] data);
+
+    // Начало изменений Lab_3_0
+    public native boolean transaction (byte[] trd);
+    // Конец изменений Lab_3_0
 }
