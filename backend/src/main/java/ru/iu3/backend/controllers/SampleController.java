@@ -11,7 +11,7 @@ public class SampleController {
     @GetMapping("/title")
     public String getTitle() {
         //return "<title>Hello from Back-end</title>";
-        //return "<title>CONNECTION SUCCESSFUL<title>";
-        return "<title>My_Backend_First_Title</title>";
+        return "<title>CONNECTION SUCCESSFUL<title>";
+        //return "<title>My_Backend_First_Title</title>";
     }
 }

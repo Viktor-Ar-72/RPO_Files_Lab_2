@@ -233,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements TransactionEvents
                 HttpURLConnection uc = (HttpURLConnection)
                         //(new URL("https://www.wikipedia.org").openConnection());
                         //(new URL("https://www.gosuslugi.ru").openConnection());
-                        //(new URL("https://www.yandex.ru").openConnection());
+                          //(new URL("https://www.yandex.ru").openConnection());
                         (new URL("http://10.0.2.2:8081/api/v1/title").openConnection());
                 InputStream inputStream = uc.getInputStream();
                 String html = IOUtils.toString(inputStream);
@@ -241,7 +241,7 @@ public class MainActivity extends AppCompatActivity implements TransactionEvents
                 if (title.equals("Портал государственных услуг Российской Федерации"))
                 {
                     runOnUiThread(() -> {
-                        Toast.makeText(this, title + " - Это гос сайт)", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, title + " - Это фу сайт)", Toast.LENGTH_LONG).show();
                     });
                 }
                 else {
@@ -290,13 +290,10 @@ public class MainActivity extends AppCompatActivity implements TransactionEvents
         return p;
     }
     //Конец изменений Lab_4_0
-
-
     /**
      * A native method that is implemented by the 'fclient' native library,
      * which is packaged with this application.
      */
-    //public native String stringFromJNI();
     public native String stringFromJNI();
 
     public static native int initRng();

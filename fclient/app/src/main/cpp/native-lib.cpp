@@ -189,20 +189,11 @@ void releaseEnv (bool detach, JNIEnv* env)
 
 
 
-//extern "C" JNIEXPORT jboolean JNICALL
-//Java_ru_iu3_fclient_MainActivity_transaction(JNIEnv *xenv, jobject xthiz, jbyteArray xtrd) {
+extern "C" JNIEXPORT jboolean JNICALL
+Java_ru_iu3_fclient_MainActivity_transaction(JNIEnv *xenv, jobject xthiz, jbyteArray xtrd) {
     // TODO: implement transaction()
     //jclass cls = env->GetObjectClass(thiz);
     //jmethodID id = env->GetMethodID(cls, "enterPIN", "(ILjava/lang/String;)Ljava/lang/String;");
-
-//}
-
-
-
-//Конец изменений Lab_3_0
-extern "C"
-JNIEXPORT jboolean JNICALL
-Java_ru_iu3_fclient_MainActivity_transaction(JNIEnv *xenv, jobject xthiz, jbyteArray xtrd) {
     jobject thiz = xenv->NewGlobalRef(xthiz);
     jbyteArray trd = (jbyteArray)xenv->NewGlobalRef(xtrd);
     //TRD 9F0206000000000100 = amount = 1p
@@ -256,3 +247,7 @@ Java_ru_iu3_fclient_MainActivity_transaction(JNIEnv *xenv, jobject xthiz, jbyteA
     t.detach();
     return true;
 }
+
+
+
+//Конец изменений Lab_3_0
