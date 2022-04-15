@@ -1,7 +1,11 @@
 package ru.iu3.backend.models;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "artists")
@@ -15,16 +19,24 @@ public class Artists {
     public Long id;
 
     // Поле с именем
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, unique = true)
     public String name;
 
     // Поле-внешний ключ countryID
-    @Column(name = "country_id")
-    public Long countryid;
+    //@Column(name = "country_id")
+    //public Long countryid;
+
+    @ManyToOne()
+    @JoinColumn(name = "country_id")
+    public Country country;
 
     // Поле "Возраст"
     @Column(name = "age")
     public String age;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "artistid")
+    public List<Paintings> paintings = new ArrayList<Paintings>();
 
     // Конструктор без параметров
     public Artists() {}

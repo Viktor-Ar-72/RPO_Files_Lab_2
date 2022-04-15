@@ -6,18 +6,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ru.iu3.backend.models.Artists;
+import ru.iu3.backend.models.Country;
+import ru.iu3.backend.models.Museums;
+import ru.iu3.backend.models.Users;
 import ru.iu3.backend.repositories.ArtistsRepository;
+import ru.iu3.backend.repositories.CountryRepositories;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("api/v1")
 public class ArtistsController {
     @Autowired
     ArtistsRepository artistsRepository;
+
+    @Autowired
+    CountryRepositories countryRepositories;
 
     @GetMapping("/artists")
     public List getAllArtists() {
@@ -27,29 +31,33 @@ public class ArtistsController {
     //curl -d '{"name":"Mone"}' -H "Content-Type: application/json" -X POST http://localhost:8081/api/v1/таблица
     @PostMapping("/artists")
     public ResponseEntity<Object> createArtist(@RequestBody Artists artists) throws Exception {
-        try {
-            // Попытка сохранить что-либо в базу данных
-            Artists newArtists = artistsRepository.save(artists);
-            return new ResponseEntity<Object>(newArtists, HttpStatus.OK);
-        } catch (Exception exception) {
-            // Указываем тип ошибки
-            String error;
-            if (exception.getMessage().contains("ConstraintViolationException")) {
-                error = "artistIsAlreadyExists";
-            } else {
-                error = exception.getMessage();
+            try {
+                // Извлекаем самостоятельно страну из пришедших данных
+                Optional<Country> cc = countryRepositories.findById(artists.country.id);
+                if (cc.isPresent()) {
+                    artists.country = cc.get();
+                }
+                // Формируем новый объект класса Artists и сохраняем его в репозиторий
+                Artists nc = artistsRepository.save(artists);
+                return new ResponseEntity<Object>(nc, HttpStatus.OK);
+            } catch (Exception exception) {
+                // Указываем тип ошибки
+                String error;
+                if (exception.getMessage().contains("ConstraintViolationException")) {
+                    error = "artistAlreadyExists";
+                } else {
+                    error = exception.getMessage();
+                }
+
+                Map<String, String> map = new HashMap<>();
+                map.put("error", error + "\n");
+
+                return ResponseEntity.ok(map);
             }
-
-            Map<String, String> map = new HashMap<>();
-            map.put("error", error + "\n");
-
-            return ResponseEntity.ok(map);
-        }
     }
 
     @PutMapping("/artists/{id}")
-    public ResponseEntity<Artists> updateCountry(@PathVariable(value = "id") Long artistsID,
-                                                 @RequestBody Artists artistDetails) {
+    public ResponseEntity<Artists> updateArtists(@PathVariable(value = "id") Long artistsID, @RequestBody Artists artistDetails) {
         Artists artist = null;
         Optional<Artists> cc = artistsRepository.findById(artistsID);
 
@@ -58,7 +66,7 @@ public class ArtistsController {
 
             artist.name = artistDetails.name;
             artist.age = artistDetails.age;
-            artist.countryid = artistDetails.countryid;
+            artist.country = artistDetails.country;
 
             artistsRepository.save(artist);
             return ResponseEntity.ok(artist);
@@ -68,7 +76,7 @@ public class ArtistsController {
     }
 
     @DeleteMapping("/artists/{id}")
-    public ResponseEntity<Object> deleteCountry(@PathVariable(value = "id") Long artistID) {
+    public ResponseEntity<Object> deleteArtists(@PathVariable(value = "id") Long artistID) {
         Optional<Artists> artists = artistsRepository.findById(artistID);
         Map<String, Boolean> resp = new HashMap<>();
 
@@ -79,7 +87,17 @@ public class ArtistsController {
         } else {
             resp.put("Artist_Deleted", Boolean.FALSE);
         }
-
         return ResponseEntity.ok(resp);
     }
+
+        @GetMapping("/artists/{id}/paintings")
+        public ResponseEntity<Object> getPaintingsFromArtist(@PathVariable(value = "id") Long artistID) {
+            Optional<Artists> optionalArtists = artistsRepository.findById(artistID);
+
+            if (optionalArtists.isPresent()) {
+                return ResponseEntity.ok(optionalArtists.get().paintings);
+            }
+
+            return ResponseEntity.ok(new ArrayList<Museums>());
+        }
 }

@@ -16,12 +16,15 @@ public class Paintings {
     @Column(name = "name")
     public String name;
 
-    @Column(name = "artist_id")
-    public Long artistid;
+    // Устанавливаем обратную связь: один ко многим от таблицы картин к таблице артистов. Обратная связь есть у художников
+    @ManyToOne
+    @JoinColumn(name = "artistid")
+    public Artists artistid;
 
-    @Column(name = "museum_id")
-    public Long museumid;
-
+    // Здесь тоже нужно сделать связь: один ко многим от таблицы картин к таблице музея
+    @ManyToOne
+    @JoinColumn(name = "museumid")
+    public Museums museumid;
     @Column(name = "year")
     public Long year;
 

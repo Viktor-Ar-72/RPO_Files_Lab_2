@@ -2,7 +2,9 @@ package ru.iu3.backend.controllers;
 
 
 import org.springframework.web.server.ResponseStatusException;
+import ru.iu3.backend.models.Artists;
 import ru.iu3.backend.models.Country;
+import ru.iu3.backend.repositories.ArtistsRepository;
 import ru.iu3.backend.repositories.CountryRepositories;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -10,10 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -21,10 +20,24 @@ public class CountryController {
     @Autowired
     CountryRepositories countryRepository;
 
+    @Autowired
+    ArtistsRepository artistsRepository;
+
     @GetMapping("/countries")
     public List getAllCountries() {
         return countryRepository.findAll();
     }
+
+    @GetMapping("/countries/{id}/artists")
+    public ResponseEntity<List<Artists>> getCountryArtists(@PathVariable(value = "id") Long id) {
+            //Optional<Country> cc = countryRepository.findById(countryId);
+        Optional<Country> cc = countryRepository.findById(id);
+            if (cc.isPresent()) {
+            return ResponseEntity.ok(cc.get().artists);
+            }
+            return ResponseEntity.ok(new ArrayList<Artists>());
+}
+
 
     // @PostMapping("/countries")
     // public ResponseEntity<Object> createCountry(@RequestBody Country country) {
@@ -78,10 +91,10 @@ public class CountryController {
 
         if (country.isPresent()) {
         countryRepository.delete(country.get());
-        resp.put("Deleted", Boolean.TRUE);
+        resp.put("Country_Deleted", Boolean.TRUE);
         }
         else
-        resp.put("Deleted", Boolean.FALSE);
+        resp.put("Country_Deleted", Boolean.FALSE);
         return ResponseEntity.ok(resp);
     }
 
