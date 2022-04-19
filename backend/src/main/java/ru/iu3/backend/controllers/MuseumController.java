@@ -6,34 +6,42 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import ru.iu3.backend.models.Museums;
-import ru.iu3.backend.models.Paintings;
-import ru.iu3.backend.repositories.MuseumsRepository;
+import ru.iu3.backend.models.Museum;
+import ru.iu3.backend.models.Painting;
+import ru.iu3.backend.repositories.MuseumRepository;
 
 import java.util.*;
 
 @RestController
 @RequestMapping("api/v1")
-public class MuseumsController {
+public class MuseumController {
     @Autowired
-    MuseumsRepository museumRepository;
+    MuseumRepository museumRepository;
 
     @GetMapping("/museums")
-    public List getAllCountries() {
+    public List getAllMuseums() {
         return museumRepository.findAll();
     }
 
+    @GetMapping("/museums/{id}/paintings")
+    public ResponseEntity<List<Painting>> getPaintingMuseums(@PathVariable(value = "id") Long museumID) {
+        Optional<Museum> cc = museumRepository.findById(museumID);
+        if (cc.isPresent()) {
+            return ResponseEntity.ok(cc.get().paintings);
+        }
+
+        return ResponseEntity.ok(new ArrayList<Painting>());
+    }
+
     @PostMapping("/museums")
-    public ResponseEntity<Object> createMuseum(@RequestBody Museums museum) throws Exception {
+    public ResponseEntity<Object> createMuseum(@RequestBody Museum museum) throws Exception {
         try {
-            // Попытка сохранить что-либо в базу данных
-            Museums newMuseum = museumRepository.save(museum);
-            return new ResponseEntity<Object>(newMuseum, HttpStatus.OK);
+            Museum newMusem = museumRepository.save(museum);
+            return new ResponseEntity<Object>(newMusem, HttpStatus.OK);
         } catch (Exception exception) {
-            // Указываем тип ошибки
             String error;
             if (exception.getMessage().contains("ConstraintViolationException")) {
-                error = "MuseumIsAlreadyExists";
+                error = "museumAlreadyExists";
             } else {
                 error = exception.getMessage();
             }
@@ -46,10 +54,10 @@ public class MuseumsController {
     }
 
     @PutMapping("/museums/{id}")
-    public ResponseEntity<Museums> updateCountry(@PathVariable(value = "id") Long museumID,
-                                                @RequestBody Museums museumDetails) {
-        Museums museum = null;
-        Optional<Museums> cc = museumRepository.findById(museumID);
+    public ResponseEntity<Museum> updateCountry(@PathVariable(value = "id") Long museumID,
+                                                 @RequestBody Museum museumDetails) {
+        Museum museum = null;
+        Optional<Museum> cc = museumRepository.findById(museumID);
 
         if (cc.isPresent()) {
             museum = cc.get();
@@ -66,26 +74,16 @@ public class MuseumsController {
 
     @DeleteMapping("/museums/{id}")
     public ResponseEntity<Object> deleteCountry(@PathVariable(value = "id") Long museumID) {
-        Optional<Museums> museum = museumRepository.findById(museumID);
+        Optional<Museum> museum = museumRepository.findById(museumID);
         Map<String, Boolean> resp = new HashMap<>();
 
-        // Возвратит true, если объект существует (не пустой)
         if (museum.isPresent()) {
             museumRepository.delete(museum.get());
-            resp.put("Museum_Deleted", Boolean.TRUE);
+            resp.put("deleted", Boolean.TRUE);
         } else {
-            resp.put("Museum_Deleted", Boolean.FALSE);
+            resp.put("deleted", Boolean.FALSE);
         }
 
         return ResponseEntity.ok(resp);
-    }
-
-    @GetMapping("/museums/{id}/paintings")
-    public ResponseEntity<List<Paintings>> getPaintingMuseums(@PathVariable(value = "id") Long museumID) {
-        Optional<Museums> cc = museumRepository.findById(museumID);
-        if (cc.isPresent()) {
-            return ResponseEntity.ok(cc.get().paintings);
-        }
-        return ResponseEntity.ok(new ArrayList<Paintings>());
     }
 }

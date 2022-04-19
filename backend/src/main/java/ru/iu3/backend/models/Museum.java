@@ -1,4 +1,5 @@
 package ru.iu3.backend.models;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
@@ -10,8 +11,7 @@ import java.util.Set;
 @Entity
 @Table(name = "museums")
 @Access(AccessType.FIELD)
-
-public class Museums {
+public class Museum {
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,21 +23,19 @@ public class Museums {
     @Column(name = "location")
     public String location;
 
-    public Museums() {
-    }
-
-    public Museums(Long id) {
-        this.id = id;
-    }
     @JsonIgnore
     @OneToMany(mappedBy = "museumid")
-    public List<Paintings> paintings = new ArrayList<>();
+    public List<Painting> paintings = new ArrayList<>();
 
-    // Указываем связь "многие-ко-многим". Идём через промежуточную таблицу usermuseums
     @JsonIgnore
     @ManyToMany
-    @JoinTable(name = "usersmuseums", joinColumns = @JoinColumn(name = "museum_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id"))
-            public Set<Users>
-            users = new HashSet<>();
+    @JoinTable(name = "usersmuseums", joinColumns = @JoinColumn(name = "museum_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+    public Set<Users> users = new HashSet<>();
+
+    public Museum() {
+    }
+
+    public Museum(Long id) {
+        this.id = id;
+    }
 }

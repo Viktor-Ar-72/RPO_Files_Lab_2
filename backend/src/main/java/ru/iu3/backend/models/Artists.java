@@ -1,16 +1,18 @@
 package ru.iu3.backend.models;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Класс-модель, описывающая артистов
+ * @author artem
+ */
 @Entity
 @Table(name = "artists")
 @Access(AccessType.FIELD)
-
 public class Artists {
     // Поле ID (not null, auto increment)
     @Id
@@ -19,30 +21,31 @@ public class Artists {
     public Long id;
 
     // Поле с именем
-    @Column(name = "name", nullable = false, unique = true)
+    @Column(name = "name", nullable = false)
     public String name;
 
-    // Поле-внешний ключ countryID
-    //@Column(name = "country_id")
-    //public Long countryid;
+    // Поле, которое показывает отношение многие-к-одному
+    @ManyToOne
+    @JoinColumn(name = "countryid")
+    public Country countryid;
 
-    @ManyToOne()
-    @JoinColumn(name = "country_id")
-    public Country country;
+    // Устанавливаем обратную связь: один ко многим от таблицы артистов в музее
+    @JsonIgnore
+    @OneToMany(mappedBy = "artistid")
+    public List<Painting> paintings = new ArrayList<Painting>();
 
     // Поле "Возраст"
     @Column(name = "age")
     public String age;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "artistid")
-    public List<Paintings> paintings = new ArrayList<Paintings>();
-
     // Конструктор без параметров
     public Artists() {}
 
+    /**
+     * Конструктор с параметром id
+     * @param id
+     */
     public Artists(Long id) {
         this.id = id;
     }
 }
-
