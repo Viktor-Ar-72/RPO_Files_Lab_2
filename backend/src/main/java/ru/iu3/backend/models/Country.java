@@ -10,14 +10,13 @@ import java.util.List;
 // Таблица в базе
 
 /**
- * Класс - модель страны
- * @author artem
+ * Класс - модель, страны
  */
 @Entity
 @Table(name = "countries")
 @Access(AccessType.FIELD)
 public class Country {
-    // Указываем дополнительные свойства
+    // Поле ID
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", updatable = false, nullable = false)
@@ -27,7 +26,6 @@ public class Country {
     @Column(name = "name", nullable = false, unique = true)
     public String name;
 
-    // Лучше поставить аннотацию JsonIgnore, так как она ограничивает появления "зеркала"
     @JsonIgnore
     @OneToMany(mappedBy = "countryid")
     public List<Artists> artists = new ArrayList<>();
@@ -38,7 +36,7 @@ public class Country {
     public Country() {}
 
     /**
-     * Конструктор с параметром IDF
+     * Конструктор с параметром ID
      * @param id - поле, являющееся главным идентификатором
      */
     public Country(Long id) {

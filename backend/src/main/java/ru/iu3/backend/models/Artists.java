@@ -7,8 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Класс-модель, описывающая артистов
- * @author artem
+ * Класс-модель, художники
  */
 @Entity
 @Table(name = "artists")
@@ -29,7 +28,8 @@ public class Artists {
     @JoinColumn(name = "countryid")
     public Country countryid;
 
-    // Устанавливаем обратную связь: один ко многим от таблицы артистов в музее
+    // Устанавливаем обратную связь: один ко многим от таблицы художников в музее
+    // JSON IGNORE - чтобы не было бесконечных циклических запросов
     @JsonIgnore
     @OneToMany(mappedBy = "artistid")
     public List<Painting> paintings = new ArrayList<Painting>();
@@ -41,10 +41,7 @@ public class Artists {
     // Конструктор без параметров
     public Artists() {}
 
-    /**
-     * Конструктор с параметром id
-     * @param id
-     */
+   // Конструктор
     public Artists(Long id) {
         this.id = id;
     }

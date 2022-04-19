@@ -49,6 +49,8 @@ public class UsersController {
         }
     }
 
+    // Добавление (скорее, Присоединение) к пользователю музеев
+    // Через usersmuseums
     @PostMapping("/users/{id}/addmuseums")
     public ResponseEntity<Object> addMuseums(@PathVariable(value = "id") Long userID,
                                              @Validated @RequestBody Set<Museum> museums) {
@@ -75,6 +77,7 @@ public class UsersController {
         return ResponseEntity.ok(response);
     }
 
+    // Отсоединение музеев от пользователя - тоже через usersmuseums
     @PostMapping("/users/{id}/removemuseums")
     public ResponseEntity<Object> removeMuseums(@PathVariable(value = "id") Long userId,
                                                 @Validated @RequestBody Set<Museum> museums) {

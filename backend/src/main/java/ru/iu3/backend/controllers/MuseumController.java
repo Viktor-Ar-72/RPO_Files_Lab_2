@@ -23,6 +23,11 @@ public class MuseumController {
         return museumRepository.findAll();
     }
 
+    /**
+     * Метод, возращает список картин в музее
+     * @param museumID - id музея
+     * @return - список картин
+     */
     @GetMapping("/museums/{id}/paintings")
     public ResponseEntity<List<Painting>> getPaintingMuseums(@PathVariable(value = "id") Long museumID) {
         Optional<Museum> cc = museumRepository.findById(museumID);
@@ -36,8 +41,9 @@ public class MuseumController {
     @PostMapping("/museums")
     public ResponseEntity<Object> createMuseum(@RequestBody Museum museum) throws Exception {
         try {
-            Museum newMusem = museumRepository.save(museum);
-            return new ResponseEntity<Object>(newMusem, HttpStatus.OK);
+            Museum newMuseum = museumRepository.save(museum);
+            //return new ResponseEntity<Object>(newMuseum, HttpStatus.OK);
+            return new ResponseEntity<>(newMuseum, HttpStatus.OK);
         } catch (Exception exception) {
             String error;
             if (exception.getMessage().contains("ConstraintViolationException")) {

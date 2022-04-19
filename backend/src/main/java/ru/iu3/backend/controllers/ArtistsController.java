@@ -15,12 +15,11 @@ import java.util.*;
 
 /**
  * Метод, который отражает логику работы таблицы артистов
- * @author artem
  */
 @RestController
 @RequestMapping("api/v1")
 public class ArtistsController {
-    // Здесь используется два репозитория: репозиторий артистов и репозиторий стран
+    // Подключение репозиториев художников и стран
     @Autowired
     ArtistRepository artistsRepository;
 
@@ -37,7 +36,7 @@ public class ArtistsController {
     }
 
     /**
-     * Метод, который возвращает по значению артиста список картин, которые он создал
+     * Метод, который возвращает по id художника список его картин
      * @param artistID - ID артиста (передаётся через JSON)
      * @return - ок, если информация была найдена. Выведет пустой список, если ничего не было найдено
      */
@@ -53,9 +52,9 @@ public class ArtistsController {
     }
 
     /**
-     * Метод, который добавляет артистов в базу данных
+     * Метод, который добавляет художников в базу данных
      * @param artists - Структура данных, которая поступает из PostMan в виде JSON-файла
-     *                где распарсивается и представлется в нужном для нас виде
+     * где распарсивается и представлется в нужном для нас виде
      * @return - Статус. 404, если ок. В противном случае, будет выдавать ошибку
      * @throws Exception - выброс исключения. Обязательное требование
      */
@@ -87,9 +86,9 @@ public class ArtistsController {
     }
 
     /**
-     * Метод, который обновляет данные для артистов
-     * @param artistsID - ID артиста, по которому будет осуществляться собственно поиск
-     * @param artistDetails - детальная информация по артистам
+     * Метод, который обновляет данные для художников
+     * @param artistsID - ID художника, по которому будет осуществляться собственно поиск
+     * @param artistDetails - детальная информация по художнику
      * @return - возвращает заголовок. Если всё ок, то 200. Иначе будет ошибка
      */
     @PutMapping("/artists/{id}")
@@ -114,8 +113,8 @@ public class ArtistsController {
     }
 
     /**
-     * Метод, который удаляет артистов
-     * @param artistID - ID артиста, который будет удалён из базы данных
+     * Метод удаления художников из БД
+     * @param artistID - ID художника, который будет удалён из базы данных
      * @return - вернёт 200, если всё было ок
      */
     @DeleteMapping("/artists/{id}")
@@ -126,9 +125,9 @@ public class ArtistsController {
         // Возвратит true, если объект существует (не пустой)
         if (artists.isPresent()) {
             artistsRepository.delete(artists.get());
-            resp.put("deleted", Boolean.TRUE);
+            resp.put("Deleted", Boolean.TRUE);
         } else {
-            resp.put("deleted", Boolean.FALSE);
+            resp.put("Deleted", Boolean.FALSE);
         }
 
         return ResponseEntity.ok(resp);

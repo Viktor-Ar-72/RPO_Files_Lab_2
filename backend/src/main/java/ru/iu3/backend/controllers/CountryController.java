@@ -15,7 +15,6 @@ import java.util.*;
 
 /**
  * Класс-контроллер таблицы "стран"
- * @author artem
  */
 @RestController
 @RequestMapping("api/v1")
@@ -25,31 +24,16 @@ public class CountryController {
     CountryRepository countryRepository;
 
     /**
-     * Метод, который возвращает просто список стран
-     * @return - Список стран, которые есть в ьазе данных
+     * Метод, возвращает просто список стран
+     * @return - Список стран, которые есть в базе данных
      */
     @GetMapping("/countries")
     public List getAllCountries() {
         return countryRepository.findAll();
     }
 
-    /**
-     * Метод, который извлекает информацию из таблицы country, вместе с информацией по конкретному artists
-     * @param countryID - ID страны
-     * @return - Возвращает artists
-     */
-    @GetMapping("/countries/{id}/artists")
-    public ResponseEntity<List<Artists>> getCountryArtists(@PathVariable(value = "id") Long countryID) {
-        Optional<Country> cc = countryRepository.findById(countryID);
-        if (cc.isPresent()) {
-            return ResponseEntity.ok(cc.get().artists);
-        }
-
-        return ResponseEntity.ok(new ArrayList<Artists>());
-    }
-
      /**
-     * Метод, который добавляет country в таблиц
+     * Метод, который добавляет country в таблицу
      * RequestBody - это наш экземпляр (через curl передаётся в виде JSON)
      * @param country - наш экземпляр класса country
      * @return - статус (ОК/НЕ ОК)
@@ -78,10 +62,10 @@ public class CountryController {
     }
 
     /**
-     * Метод, который обновляет данные в таблице
-     * @param countryID - указываем id по которому будем обновлять данные
-     * @param countryDetails - сводки по Country
-     * @return - ОК/НЕ ОК
+     * Метод, обновляет данные в таблице
+     * @param countryID - id для обновления данных
+     * @param countryDetails - информация о стране
+     * @return - удалось или нет
      */
     @PutMapping("/countries/{id}")
     public ResponseEntity<Country> updateCountry(@PathVariable(value = "id") Long countryID,
@@ -96,13 +80,13 @@ public class CountryController {
             countryRepository.save(country);
             return ResponseEntity.ok(country);
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "country not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Сountry not found");
         }
     }
 
     /**
-     * Метод, который удаляет информацию из базы данных
-     * @param countryId - по какому ID-шнику удаляем информацию
+     * Метод, который удаляет страну из базы данных
+     * @param countryId - по какому ID удаляем страну
      * @return - возвращает true, если удалено успешно, false - в противном случае
      */
     @DeleteMapping("/countries/{id}")
@@ -113,11 +97,26 @@ public class CountryController {
         // Возвратит true, если объект существует (не пустой)
         if (country.isPresent()) {
             countryRepository.delete(country.get());
-            resp.put("deleted", Boolean.TRUE);
+            resp.put("Deleted", Boolean.TRUE);
         } else {
-            resp.put("deleted", Boolean.FALSE);
+            resp.put("Deleted", Boolean.FALSE);
         }
 
         return ResponseEntity.ok(resp);
+    }
+
+    /**
+     * Метод, который извлекает информацию из таблицы country, вместе с информацией по конкретному художнику
+     * @param countryID - ID страны
+     * @return - Возвращает artists
+     */
+    @GetMapping("/countries/{id}/artists")
+    public ResponseEntity<List<Artists>> getCountryArtists(@PathVariable(value = "id") Long countryID) {
+        Optional<Country> cc = countryRepository.findById(countryID);
+        if (cc.isPresent()) {
+            return ResponseEntity.ok(cc.get().artists);
+        }
+
+        return ResponseEntity.ok(new ArrayList<Artists>());
     }
 }

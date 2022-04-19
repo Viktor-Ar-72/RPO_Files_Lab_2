@@ -31,17 +31,18 @@ public class Users {
     @Column(name = "salt")
     public String salt;
 
-    @JsonIgnore
+    // JSON IGNORE был убран в Lab_7, чтобы можно было нормально смотреть текущий токен пользователя
+    //@JsonIgnore
     @Column(name = "token")
     public String token;
 
     @Column(name = "activity")
-    //public LocalDateTime activity;
-    public String activity;
+    public LocalDateTime activity;
+    //public String activity;
 
     // Устанавливаем отношение многим-ко-многим
     // Важно: для отношений многие-ко-многим нужно использовать именно множество, потому что
-    // JPA генерирует очень неэффективный код
+    // JPA генерирует очень неэффективный код (если верить Mister A.B.)
     @ManyToMany(mappedBy = "users")
     public Set<Museum> museums = new HashSet<>();
 

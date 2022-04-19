@@ -12,7 +12,6 @@ import java.util.List;
 
 /**
  * Класс - модель картин
- * @author artem
  */
 public class Painting {
     // Поле ID - является первичным ключом
@@ -25,7 +24,8 @@ public class Painting {
     @Column(name = "name")
     public String name;
 
-    // Устанавливаем обратную связь: один ко многим от таблицы картин к таблице артистов. Обратная связь есть у артистов
+    // Устанавливаем обратную связь: один ко многим от таблицы картин к таблице художников.
+    // Обратная связь - у художников
     @ManyToOne
     @JoinColumn(name = "artistid")
     public Artists artistid;
@@ -35,7 +35,7 @@ public class Painting {
     @JoinColumn(name = "museumid")
     public Museum museumid;
 
-    // Это поле - возраст картины
+    // Возраст картины
     @Column(name = "year")
     public Long year;
 }

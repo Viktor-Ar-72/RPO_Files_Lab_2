@@ -27,14 +27,18 @@ public class Museum {
     @OneToMany(mappedBy = "museumid")
     public List<Painting> paintings = new ArrayList<>();
 
+    // Связь "многие-ко-многим". JSON IGNORE - для избежания зацикливания
+    // Связь идёт через доп. таблицу usersmuseums
     @JsonIgnore
     @ManyToMany
     @JoinTable(name = "usersmuseums", joinColumns = @JoinColumn(name = "museum_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     public Set<Users> users = new HashSet<>();
 
+    //Конструктор без прарметров
     public Museum() {
     }
 
+    // Конструктор с параметром ID
     public Museum(Long id) {
         this.id = id;
     }

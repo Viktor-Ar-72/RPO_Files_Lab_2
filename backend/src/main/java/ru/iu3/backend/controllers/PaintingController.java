@@ -15,8 +15,7 @@ import ru.iu3.backend.repositories.PaintingRepository;
 import java.util.*;
 
 /**
- * Класс - контроллер картин
- * @author artem
+ * Класс - контроллер таблицы картин
  */
 @RestController
 @RequestMapping("api/v1")
@@ -64,9 +63,9 @@ public class PaintingController {
     }
 
     /**
-     * Метод, обновляющий данные по картинам
+     * Метод, обновляющий данные по картине
      * @param id - ID картины
-     * @param paintingDetails - сведения по картинам
+     * @param paintingDetails - сведения о картине
      * @return - ОК/не ОК
      */
     @PutMapping("/paintings/{id}")
@@ -78,7 +77,7 @@ public class PaintingController {
         if (cc.isPresent()) {
             painting = cc.get();
 
-            // Сведения о картинах
+            // Сведения о картине - название, кто автор, музей, год
             painting.name = paintingDetails.name;
             painting.museumid = paintingDetails.museumid;
             painting.artistid = paintingDetails.artistid;
