@@ -19,6 +19,10 @@ import java.util.UUID;
  * Класс - контроллер авторизации.
  * Он идёт без привязки к модели, поэтому пишется отдельно
  */
+
+//Changes from Lab - 9
+// Иначе будет ошибка из - за политики одного источника
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/auth")
 public class LoginController {

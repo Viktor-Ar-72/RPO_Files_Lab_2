@@ -1,6 +1,7 @@
 package ru.iu3.backend.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -33,6 +34,8 @@ public class Users {
 
     // JSON IGNORE был убран в Lab_7, чтобы можно было нормально смотреть текущий токен пользователя
     //@JsonIgnore
+    //Update_28_04_2022: вернут
+    @JsonIgnore
     @Column(name = "token")
     public String token;
 

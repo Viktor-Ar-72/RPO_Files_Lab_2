@@ -7,8 +7,8 @@ import 'bootstrap/dist/css/bootstrap-grid.min.css'
 import NavigationBarClass from "./components/NavigationBarClass";
 import Home from "./components/Home";
 import Another_Home from "./components/Another_Home";
+import Login from "./components/Login";
 
-//export default function App() {
 function App() {
   return (
       <div className="App">
@@ -21,6 +21,8 @@ function App() {
             <Routes>
                 <Route path="home" element={<Home />}/>
                 <Route path="Another_Home" element={<Another_Home />}></Route>
+                {/* Added from Lab_9*/}
+                <Route path="Login" element={<Login />}></Route>
             </Routes>
           </div>
         </BrowserRouter>
@@ -28,7 +30,10 @@ function App() {
   );
 }
 
-export default App
+export default App;
+
+
+
 /**
 import logo from './logo.svg';
 import './App.css';
