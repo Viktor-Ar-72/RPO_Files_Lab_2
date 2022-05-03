@@ -1,7 +1,7 @@
 import React from "react";
 import {Navbar, Nav} from "react-bootstrap";
-import {faHome, faUser} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faHome, faUser} from "@fortawesome/free-solid-svg-icons";
 import {Link} from "react-router-dom";
 
 import {useNavigate} from "react-router-dom"
@@ -9,29 +9,35 @@ import Utils from "../utils/Utils";
 import axios from "axios";
 import BackendService from "../services/BackendService";
 
+//Компонент должен быть подключен к хранилищу, для того что бы пользоваться функционалом redux.
+import {connect} from "react-redux";
+import {userActions} from "../utils/Rdx";
+
 class NavigationBarClass extends React.Component {
+
     constructor(props) {
         super(props);
-        // Привязка к конструктору
+
+        // Привязываем к конструктору
         this.goHome = this.goHome.bind(this);
         this.logout = this.logout.bind(this);
     }
 
-    // Переход на другую страницу
+    // Метод, который осуществляет переход на другую страницу (Another Home)
     goHome() {
         this.props.navigate('Another_Home');
     }
 
-    // Отключение пользователя
     logout() {
         BackendService.logout().then(() => {
             Utils.removeUser();
-            this.goHome()
+            this.props.dispatch(userActions.logout())
+            this.props.navigate("Login")
+            //this.goHome()
         });
     }
 
     render() {
-        let uname = Utils.getUserName();
         return (
             <Navbar bg="light" expand="lg">
                 <Navbar.Brand><FontAwesomeIcon icon={faHome}/>{' '} My RPO</Navbar.Brand>
@@ -45,20 +51,19 @@ class NavigationBarClass extends React.Component {
                         <Nav.Link onClick={this.goHome}>Another Home</Nav.Link>
                     </Nav>
 
-                    <Navbar.Text>{uname}</Navbar.Text>
-                    {
-                        uname &&
-                        <Nav.Link onClick={this.logout}><FontAwesomeIcon icon={faUser} fixedWidth/>{' '}Выход</Nav.Link>
-                    }
-                    {
-                        !uname &&
-                        <Nav.Link as={Link} to="/login"><FontAwesomeIcon icon={faUser} fixedWidth/>{' '}Вход</Nav.Link>
-                    }
                 </Navbar.Collapse>
+                <Navbar.Text>{this.props.user && this.props.user.login}</Navbar.Text>
+                {
+                    this.props.user &&
+                    <Nav.Link onClick={this.logout}><FontAwesomeIcon icon={faUser} fixedWidth/>{' '}Выход</Nav.Link>
+                }
+                {
+                    !this.props.user &&
+                    <Nav.Link as={Link} to="/login"><FontAwesomeIcon icon={faUser} fixedWidth/>{' '}Вход</Nav.Link>
+                }
             </Navbar>
         );
     }
-
 }
 
 // Свойство, которое получает компонент для навигации и передаёт экземпляру класса
@@ -66,6 +71,17 @@ const NavigationBar = props => {
     const navigate = useNavigate()
     return <NavigationBarClass navigate={navigate} {...props} />
 }
+// Функция mapStateToProps отображает состояние хранилища redux (не путать с состоянием компонента)
+// в свойства которые передаются компоненту при перезапуске в параметрах конструктора,
+// если компонент это класс или в параметрах функции, если компонент это функция.
+// В нашем случае используется обертка, которая делает из класса функцию для внешних клиентов
+//
+//mapStateToProps вызывается каждый раз, при изменении состояния, перед прорисовкой компонента.
+const mapStateToProps = state => {
+    const {user} = state.authentication;
+    return {user};
+}
 
-//export default NavigationBarClass;
-export default NavigationBar;
+//
+//export default NavigationBar;
+export default connect(mapStateToProps)(NavigationBar);
