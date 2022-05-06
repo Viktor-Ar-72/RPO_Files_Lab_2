@@ -17,6 +17,8 @@ import java.util.*;
 /**
  * Класс - контроллер таблицы картин
  */
+//Added in Lab_11
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("api/v1")
 public class PaintingController {

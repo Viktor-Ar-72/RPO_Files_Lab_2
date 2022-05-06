@@ -1,7 +1,7 @@
 import React from "react";
 import {Navbar, Nav} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faHome, faUser} from "@fortawesome/free-solid-svg-icons";
+import {faBars, faHome, faUser} from "@fortawesome/free-solid-svg-icons";
 import {Link} from "react-router-dom";
 
 import {useNavigate} from "react-router-dom"
@@ -9,7 +9,6 @@ import Utils from "../utils/Utils";
 import axios from "axios";
 import BackendService from "../services/BackendService";
 
-//Компонент должен быть подключен к хранилищу, для того что бы пользоваться функционалом redux.
 import {connect} from "react-redux";
 import {userActions} from "../utils/Rdx";
 
@@ -40,7 +39,12 @@ class NavigationBarClass extends React.Component {
     render() {
         return (
             <Navbar bg="light" expand="lg">
-                <Navbar.Brand><FontAwesomeIcon icon={faHome}/>{' '} My RPO</Navbar.Brand>
+                <button type="button"
+                        className="btn btn-outline-secondary mr-2"
+                        onClick={this.props.toggleSideBar}>
+                    <FontAwesomeIcon icon={faBars}/>
+                </button>
+                <Navbar.Brand>{' '} My RPO</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav"/>
                 <Navbar.Collapse id="basics-navbar-nav">
                     <Nav className="me-auto">
@@ -71,17 +75,12 @@ const NavigationBar = props => {
     const navigate = useNavigate()
     return <NavigationBarClass navigate={navigate} {...props} />
 }
-// Функция mapStateToProps отображает состояние хранилища redux (не путать с состоянием компонента)
-// в свойства которые передаются компоненту при перезапуске в параметрах конструктора,
-// если компонент это класс или в параметрах функции, если компонент это функция.
-// В нашем случае используется обертка, которая делает из класса функцию для внешних клиентов
-//
-//mapStateToProps вызывается каждый раз, при изменении состояния, перед прорисовкой компонента.
+
 const mapStateToProps = state => {
     const {user} = state.authentication;
     return {user};
 }
 
-//
 //export default NavigationBar;
+// Новая и, главное, работающая реализация - спасибо MisterФИ
 export default connect(mapStateToProps)(NavigationBar);

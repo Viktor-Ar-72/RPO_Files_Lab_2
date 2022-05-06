@@ -12,6 +12,8 @@ import ru.iu3.backend.repositories.MuseumRepository;
 
 import java.util.*;
 
+//Added in Lab_11
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("api/v1")
 public class MuseumController {
