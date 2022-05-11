@@ -29,6 +29,10 @@ public class Users {
     @Column(name = "password")
     public String password;
 
+    // Lab_12_Changes: New password
+    @Transient
+    public String np; // Переменная нового пароля
+
     // Поле - электронная почта
     @Column(name = "email")
     public String email;

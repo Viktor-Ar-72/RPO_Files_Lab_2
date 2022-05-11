@@ -16,10 +16,9 @@ class BackendService {
         return axios.get(`${AUTH_URL}/logout`, { headers : {Authorization : Utils.getToken()}})
     }
 
-    // Бооольшая ошибка в методичке:
-    // Не было добавлено заголовков и токенов. Если бы не исправили - вообще ничего не работало бы /)
+    // Таблица "Страны"
     retrieveAllCountries(page, limit) {
-        return axios.get(`${API_URL}/countries`, { headers : {Authorization : Utils.getToken()}});
+        return axios.get(`${API_URL}/countries?page=${page}&limit=${limit}`, { headers : {Authorization : Utils.getToken()}});
     }
     retrieveCountry(id) {
         return axios.get(`${API_URL}/countries/${id}`, { headers : {Authorization : Utils.getToken()}});
@@ -30,8 +29,95 @@ class BackendService {
     updateCountry(country) {
         return axios.put(`${API_URL}/countries/${country.id}`, country, { headers : {Authorization : Utils.getToken()}});
     }
+
     deleteCountries(countries) {
         return axios.post(`${API_URL}/deletecountries`, countries, { headers : {Authorization : Utils.getToken()}});
+    }
+
+
+    // Changes from Lab_12
+    // Таблица "Художники"
+    retrieveAllArtists(page, limit) {
+        return axios.get(`${API_URL}/artists?page=${page}&limit=${limit}`, { headers : {Authorization : Utils.getToken()}});
+    }
+
+    retrieveArtist(id) {
+        return axios.get(`${API_URL}/artists/${id}`, { headers : {Authorization : Utils.getToken()}});
+    }
+
+    createArtist(artist) {
+        return axios.post(`${API_URL}/artists`, artist, { headers : {Authorization : Utils.getToken()}});
+    }
+
+    updateArtist(artist) {
+        return axios.put(`${API_URL}/artists/${artist.id}`, artist, { headers : {Authorization : Utils.getToken()}});
+    }
+
+    deleteArtists(artists) {
+        return axios.post(`${API_URL}/deleteartists`, artists, { headers : {Authorization : Utils.getToken()}});
+    }
+
+    // Таблица "Музеи"
+    retrieveAllMuseums(page, limit) {
+        return axios.get(`${API_URL}/museums?page=${page}&limit=${limit}`, { headers : {Authorization : Utils.getToken()}});
+    }
+
+    retrieveMuseum(id) {
+        return axios.get(`${API_URL}/museums/${id}`, { headers : {Authorization : Utils.getToken()}});
+    }
+
+    createMuseum(museum) {
+        return axios.post(`${API_URL}/museums`, museum, { headers : {Authorization : Utils.getToken()}});
+    }
+
+    updateMuseum(museum) {
+        return axios.put(`${API_URL}/museums/${museum.id}`, museum, { headers : {Authorization : Utils.getToken()}});
+    }
+
+    deleteMuseums(museums) {
+        return axios.post(`${API_URL}/deletemuseums`, museums, { headers : {Authorization : Utils.getToken()}});
+    }
+
+    // Таблица "Картины"
+    retrieveAllPaintings(page, limit) {
+        return axios.get(`${API_URL}/paintings/?page=${page}&limit=${limit}`, { headers : {Authorization : Utils.getToken()}});
+    }
+
+    retrievePainting(id) {
+        return axios.get(`${API_URL}/paintings/${id}`, { headers : {Authorization : Utils.getToken()}});
+    }
+
+    createPainting(painting) {
+        return axios.post(`${API_URL}/paintings`, painting, { headers : {Authorization : Utils.getToken()}});
+    }
+
+    updatePainting(painting) {
+        return axios.put(`${API_URL}/paintings/${painting.id}`, painting, { headers : {Authorization : Utils.getToken()}});
+    }
+
+    deletePaintings(painting) {
+        return axios.post(`${API_URL}/deletepaintings`, painting, { headers : {Authorization : Utils.getToken()}});
+    }
+
+    // Таблица "Пользователи"
+    retrieveAllUsers(page, limit) {
+        return axios.get(`${API_URL}/users?page=${page}&limit=${limit}`, { headers : {Authorization : Utils.getToken()}});
+    }
+
+    retrieveUser(id) {
+        return axios.get(`${API_URL}/users/${id}`, { headers : {Authorization : Utils.getToken()}});
+    }
+
+    createUser(user) {
+        return axios.post(`${API_URL}/users`, user, { headers : {Authorization : Utils.getToken()}});
+    }
+
+    updateUser(user) {
+        return axios.put(`${API_URL}/users/${user.id}`, user, { headers : {Authorization : Utils.getToken()}});
+    }
+
+    deleteUsers(user) {
+        return axios.post(`${API_URL}/deleteusers`, user, { headers : {Authorization : Utils.getToken()}});
     }
 }
 
@@ -47,7 +133,6 @@ axios.interceptors.request.use(
         // let token = Utils.getToken();
         // if (token)
         //    config.headers.Authorization = token;
-
         return config;
    },
    error => {
@@ -55,12 +140,8 @@ axios.interceptors.request.use(
         return Promise.reject(error);
     })
 
-// Комментарий от MisterФИ, его же слова, любезно мной записанные
-// Здесь вскрылась ещё одна беда:
-// При получении ошибки не выводится её название, а пишется стандартное сообщение,
-// хотя на стороне бэкенда класс написан корректно и путём отладки было установлено,
-// что в 500 ошибку записывается данное сообщение.
-// Но на стороне фронтенда мы её не получаем. Причём выполняется только последнее условие
+
+
 axios.interceptors.response.use(undefined,
     error => {
         if (error.response && error.response.status && [401, 403].indexOf(error.response.status) !== -1) {

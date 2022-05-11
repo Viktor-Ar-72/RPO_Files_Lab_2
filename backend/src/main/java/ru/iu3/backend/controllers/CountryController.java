@@ -15,6 +15,11 @@ import ru.iu3.backend.tools.DataValidationException;
 
 import java.util.*;
 
+// Changes from Lab_12
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+
 /**
  * Класс-контроллер таблицы "Страны"
  */
@@ -30,9 +35,13 @@ public class CountryController {
      * Метод, который возвращает просто список стран
      * @return - Список стран, которые есть в базе данных
      */
+    // Изменён в 12 лабораторной, подключаем страницы
     @GetMapping("/countries")
-    public List getAllCountries() {
-        return countryRepository.findAll();
+    // public List getAllCountries() {
+    //    return countryRepository.findAll();
+    //}
+    public Page<Country> getAllCountries(@RequestParam("page") int page, @RequestParam("limit") int limit) {
+        return countryRepository.findAll(PageRequest.of(page, limit, Sort.by(Sort.Direction.ASC, "name")));
     }
 
     /**
